@@ -1,0 +1,38 @@
+version: '3'
+services:
+    frontend:
+        image: ghcr.io/ahmedhussiien/flickr-frontend:latest
+        restart: unless-stopped
+        networks:
+            - traefik
+        labels:
+          - traefik.enable=true
+    
+          - traefik.http.routers.frontend.rule=( Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`) )
+          - traefik.http.routers.frontend.tls.certResolver=letsEncrypt
+          - traefik.http.routers.frontend.tls.options=myTLSOptions@file
+
+          - traefik.http.services.frontend.loadBalancer.healthCheck.interval= "1s"
+          - traefik.http.services.frontend.loadBalancer.healthCheck.timeout= "3s"
+
+    backend:
+        image: ghcr.io/ahmedhussiien/flickr-backend:latest
+        restart: unless-stopped
+        env_file:
+            - backend.env
+        networks:
+            - traefik
+        labels:
+            - traefik.enable=true
+      
+            - traefik.http.routers.backend.rule=( Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`) ) && PathPrefix(`/api`)
+            - traefik.http.routers.backend.tls.certResolver=letsEncrypt
+            - traefik.http.routers.backend.tls.options=myTLSOptions@file
+
+            - traefik.http.services.backend.loadBalancer.healthCheck.interval= "1s"
+            - traefik.http.services.backend.loadBalancer.healthCheck.timeout= "3s"
+
+networks:
+    traefik:
+        external:
+            name: traefik_proxy
