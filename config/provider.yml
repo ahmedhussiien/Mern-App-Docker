@@ -1,0 +1,40 @@
+# Dynamic configuration
+
+http:
+  routers:
+    backend:
+      rule: "Host(`example.com`) && PathPrefix(`/api`)"
+      service: backend
+      tls: 
+        certResolver: lets_encrypt
+        options: myTLSOptions
+
+    frontend:
+      rule: "Host(`example.com`)"
+      service: backend
+      tls: 
+        certResolver: lets_encrypt
+        options: myTLSOptions
+            
+  services:
+    backend:
+      loadBalancer:
+        port: 3000
+        healthCheck:
+          path: /health
+          interval: "1s"
+          timeout: "3s"
+        servers:
+          - url: "http://husseinmac:1111/"
+          - url: "http://husseinmac:2222/"
+
+    frontend:
+      loadBalancer:
+        port: 80
+        healthCheck:
+          path: /
+          interval: "1s"
+          timeout: "3s"
+        servers:
+          - url: "http://husseinmac:3333/"
+          - url: "http://husseinmac:4444/"
