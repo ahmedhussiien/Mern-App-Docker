@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-if [ $(docker ps -f name=blue -q) ]
+if [[ $(docker ps -f name=blue -q) ]]
 then
     ENV="green"
     OLD="blue"
@@ -16,7 +16,7 @@ echo "Starting "$ENV" container"
 docker-compose --project-name=$ENV up -d
 
 echo "Waiting..."
-sleep 10s
+sleep 5s
 
 echo "Stopping "$OLD" container"
 docker-compose --project-name=$OLD down
